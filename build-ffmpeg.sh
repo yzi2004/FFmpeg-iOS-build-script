@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # directories
-FF_VERSION="4.1"
+FF_VERSION="4.1.3"
 #FF_VERSION="snapshot-git"
 if [[ $FFMPEG_VERSION != "" ]]; then
   FF_VERSION=$FFMPEG_VERSION
@@ -18,28 +18,20 @@ THIN=`pwd`/"thin"
 
 #FDK_AAC=`pwd`/../fdk-aac-build-script-for-iOS/fdk-aac-ios
 
-CONFIGURE_FLAGS="--enable-cross-compile --disable-debug --disable-programs \
-                 --disable-doc --enable-pic"
+source "ffmpeg_conf.sh"
 
-if [ "$X264" ]
-then
-	CONFIGURE_FLAGS="$CONFIGURE_FLAGS --enable-gpl --enable-libx264"
-fi
-
-if [ "$FDK_AAC" ]
-then
-	CONFIGURE_FLAGS="$CONFIGURE_FLAGS --enable-libfdk-aac --enable-nonfree"
-fi
+CONFIGURE_FLAGS="--enable-cross-compile --disable-debug \
+                 $COMMON_FF_CFG_FLAGS --enable-pic"
 
 # avresample
 #CONFIGURE_FLAGS="$CONFIGURE_FLAGS --enable-avresample"
 
-ARCHS="arm64 armv7 x86_64 i386"
+ARCHS="arm64 x86_64"
 
 COMPILE="y"
 LIPO="y"
 
-DEPLOYMENT_TARGET="8.0"
+DEPLOYMENT_TARGET="12.1"
 
 if [ "$*" ]
 then
@@ -121,16 +113,6 @@ then
 
 		CXXFLAGS="$CFLAGS"
 		LDFLAGS="$CFLAGS"
-		if [ "$X264" ]
-		then
-			CFLAGS="$CFLAGS -I$X264/include"
-			LDFLAGS="$LDFLAGS -L$X264/lib"
-		fi
-		if [ "$FDK_AAC" ]
-		then
-			CFLAGS="$CFLAGS -I$FDK_AAC/include"
-			LDFLAGS="$LDFLAGS -L$FDK_AAC/lib"
-		fi
 
 		TMPDIR=${TMPDIR/%\/} $CWD/$SOURCE/configure \
 		    --target-os=darwin \
